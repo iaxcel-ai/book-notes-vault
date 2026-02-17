@@ -85,7 +85,7 @@ header h1 {
   letter-spacing: -0.5px;
 }
 
-/* Navigation - Sidebar on Desktop */
+/* Navigation Sidebar on Desktop */
 nav {
   background: var(--bg-nav);
   border-right: 1px solid var(--border-color);
@@ -377,7 +377,6 @@ input:focus {
   border: 1px solid #fca5a5;
 }
 
-/* Footer */
 footer {
   background: var(--bg-nav);
   color: var(--text-muted);
@@ -394,15 +393,12 @@ footer {
     flex-direction: row;
     /* Horizontal layout */
     flex-wrap: wrap;
-    /* Allow header to be full width if needed, but let's try strict sidebar */
+    /* Allow header to be full width if needed*/
     overflow-x: hidden;
   }
 
   header {
     width: 100%;
-    /* Keep header top-level if simple, or move it? 
-      Let's stick to Header Top, Nav Left, Main Right 
-    */
     position: fixed;
     top: 0;
     left: 0;
@@ -426,9 +422,7 @@ footer {
 
   main {
     margin-top: 80px;
-    /* Offset fixed header */
     margin-left: 250px;
-    /* Offset fixed sidebar */
     width: calc(100% - 250px);
     max-width: 1200px;
     padding: 3rem;
@@ -449,7 +443,6 @@ footer {
     border-bottom: 1px solid var(--border-color);
     border-right: none;
     position: sticky;
-    /* Sticky nav on mobile is nice */
     top: 0;
     z-index: 10;
   }
@@ -469,7 +462,6 @@ footer {
   }
 }
 
-/* Skip Link */
 .skip-link {
   position: absolute;
   left: -999px;
