@@ -19,9 +19,40 @@ themeToggleBtn.addEventListener('click', () => {
 
 
 function updateStats(data) {
-  document.getElementById("totalBooks").textContent = "Total Books: " + data.length;
-  const pages = data.reduce((a, b) => a + b.pages, 0);
-  document.getElementById("totalPages").textContent = "Total Pages: " + pages;
+  // 1. Total Books
+  document.getElementById("totalBooks").textContent = data.length;
+
+  // 2. Total Pages
+  const pages = data.reduce((a, b) => a + (Number(b.pages) || 0), 0);
+  document.getElementById("totalPages").textContent = pages.toLocaleString();
+
+  // 3. Top Tag
+  const tagCounts = {};
+  data.forEach(book => {
+    const t = book.tag ? book.tag.trim() : "Uncategorized";
+    tagCounts[t] = (tagCounts[t] || 0) + 1;
+  });
+
+  let topTag = "-";
+  let maxCount = 0;
+  for (const [tag, count] of Object.entries(tagCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      topTag = tag;
+    }
+  }
+  document.getElementById("topTag").textContent = topTag;
+
+  // 4. Last 7 Days
+  const now = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(now.getDate() - 7);
+
+  const recentBooks = data.filter(b => {
+    const d = new Date(b.dateAdded);
+    return d >= sevenDaysAgo && d <= now;
+  });
+  document.getElementById("last7").textContent = recentBooks.length;
 }
 
 books.push(...loadBooks());
