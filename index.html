@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book & Notes Vault</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header>
+  <h1>Book & Notes Vault</h1>
+</header>
+
+  <button id="themeToggle" aria-label="Toggle Dark Mode">Theme</button>
+  <button>Dashboard</button>
+  <button>Records</button>
+  <button>Add</button>
+  <button>Settings</button>
+  <button>About</button>
+</nav>
+
+<main id="main">
+
+<section id="dashboard">
+  <h2>Dashboard</h2>
+  <p id="totalBooks"></p>
+  <p id="totalPages"></p>
+  <p id="topTag"></p>
+  <p id="last7"></p>
+</section>
+
+<section id="records">
+  <h2>Records</h2>
+</section>
+
+<section id="form">
+  <h2>Add Book</h2>
+  <form id="bookForm">
+    <label>Title</label>
+    <input type="text" id="title" required>
+    <label>Author</label>
+    <input type="text" id="author" required>
+    <label>Pages</label>
+    <input type="number" id="pages" required>
+    <label>Tag</label>
+    <input type="text" id="tag" required>
+    <label>Date Added</label>
+    <input type="date" id="dateAdded" required>
+    <button type="submit">Save</button>
+    <p id="formMsg" role="status" aria-live="assertive"></p>
+  </form>
+</section>
+
+<section id="settings">
+  <h2>Settings</h2>
+  <div class="settings-buttons">
+    <label>Import JSON: <input type="file" id="importJSON"></label>
+    <button id="exportJSON">Export Books</button>
+  </div>
+</section>
+
+<section id="about">
+  <h2>About</h2>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2026 Book Vault</p>
+</footer>
+
+<script type="module" src="scripts/main.js"></script>
+</body>
+</html>
