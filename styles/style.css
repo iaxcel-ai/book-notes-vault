@@ -401,7 +401,7 @@ footer {
   header {
     width: 100%;
     /* Keep header top-level if simple, or move it? 
-       Let's stick to Header Top, Nav Left, Main Right 
+      Let's stick to Header Top, Nav Left, Main Right 
     */
     position: fixed;
     top: 0;
