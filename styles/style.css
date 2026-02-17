@@ -22,6 +22,8 @@
   --tag-bg: #e0e7ff;
   --tag-text: #3730a3;
   --input-bg: #ffffff;
+  --highlight-bg: #fde047;
+  --highlight-text: #000000;
 }
 
 /* Dark Theme overrides */
@@ -40,8 +42,9 @@ body.dark-mode {
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
   --gradient-header: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
   --tag-bg: #312e81;
-  --tag-text: #e0e7ff;
   --input-bg: #374151;
+  --highlight-bg: #fbbf24;
+  --highlight-text: #000000;
 }
 
 html {
@@ -57,6 +60,13 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+mark {
+  background-color: var(--highlight-bg);
+  color: var(--highlight-text);
+  border-radius: 2px;
+  padding: 0 2px;
 }
 
 header {
@@ -169,15 +179,50 @@ section h2 {
   margin: 0;
 }
 
-/* Records */
-#records {
+/* Records Controls */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  background: var(--bg-body);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+#searchInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-controls select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+/* Records Grid Container */
+#recordsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
+/* Records Section Header */
 #records>h2 {
   grid-column: 1 / -1;
+  margin-bottom: 1rem;
 }
 
 .record-card {
