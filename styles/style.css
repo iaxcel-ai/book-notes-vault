@@ -44,70 +44,79 @@ body.dark-mode {
   --input-bg: #374151;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: var(--text-main);
   background-color: var(--bg-body);
   transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Header */
 header {
   background: var(--gradient-header);
   color: white;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   box-shadow: var(--shadow);
+  z-index: 20;
+  position: relative;
 }
 
 header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
-/* Navigation */
+/* Navigation - Sidebar on Desktop */
 nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 1.5rem 1rem;
   background: var(--bg-nav);
-  border-bottom: 1px solid var(--border-color);
-  justify-content: center;
+  border-right: 1px solid var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  /* Stack vertically by default for sidebar */
+  gap: 0.5rem;
 }
 
-nav button {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
+/* Nav Links as Buttons */
+.nav-link {
+  display: block;
+  padding: 0.75rem 1.25rem;
   color: var(--text-main);
-  border-radius: 6px;
-  cursor: pointer;
+  text-decoration: none;
   font-weight: 500;
+  border-radius: 6px;
   transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-nav button:hover {
+.nav-link:hover {
   background: var(--primary-color);
   color: white;
-  border-color: var(--primary-color);
-  transform: translateY(-1px);
+  transform: translateX(4px);
   box-shadow: var(--shadow);
 }
 
-nav button:focus {
-  outline: 3px solid var(--primary-color);
-  outline-offset: 2px;
+.nav-link:focus {
+  outline: 2px solid var(--primary-color);
+  background: var(--bg-body);
 }
 
 /* Main & Sections */
 main {
-  padding: 2rem 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 2rem;
+  flex: 1;
+  max-width: 1000px;
+  /* Limit width for readability */
 }
 
 section {
@@ -117,6 +126,8 @@ section {
   margin-bottom: 2rem;
   box-shadow: var(--shadow);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  scroll-margin-top: 2rem;
+  /* Spacing for smooth scroll target */
 }
 
 section h2 {
@@ -127,23 +138,35 @@ section h2 {
   padding-bottom: 0.75rem;
 }
 
-/* Dashboard Stats */
-#dashboard {
+/* Dashboard Stats Grid */
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-#dashboard p {
+.stat-box {
   background: var(--bg-body);
   padding: 1.5rem;
   border-radius: 8px;
   border-left: 4px solid var(--primary-color);
-  font-weight: 500;
-  font-size: 1.1rem;
-  color: var(--text-main);
   box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stat-box h3 {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-box p {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
 }
 
 /* Records */
@@ -153,11 +176,11 @@ section h2 {
   gap: 1.5rem;
 }
 
-#records > h2 {
+#records>h2 {
   grid-column: 1 / -1;
 }
 
-#records div {
+.record-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -167,26 +190,26 @@ section h2 {
   flex-direction: column;
 }
 
-#records div:hover {
+.record-card:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-4px);
   border-color: var(--primary-color);
 }
 
-#records h4 {
+.record-card h4 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
   color: var(--text-main);
 }
 
-#records p {
+.record-card p {
   color: var(--text-muted);
   margin: 0.25rem 0;
   font-size: 0.95rem;
 }
 
-#records button {
-  margin-top: auto; /* Push button to bottom */
+.delete-btn {
+  margin-top: auto;
   width: 100%;
   padding: 0.75rem;
   background: var(--danger-color);
@@ -198,25 +221,15 @@ section h2 {
   transition: all 0.2s ease;
 }
 
-#records button:hover {
-  background: #dc2626; /* Slightly darker shade manually if needed, or rely on opacity */
+.delete-btn:hover {
   filter: brightness(0.9);
   transform: scale(1.02);
 }
 
-#records button:focus {
-  outline: 3px solid var(--danger-color);
-  outline-offset: 2px;
-}
-
 /* Form */
-#form h2 {
-  grid-column: 1 / -1;
-}
-
 #bookForm {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
   max-width: 600px;
 }
 
@@ -224,7 +237,7 @@ label {
   display: block;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 input[type="text"],
@@ -242,17 +255,15 @@ input[type="file"] {
   color: var(--text-main);
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
-input[type="file"]:focus {
+input:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-#bookForm > button,
-#exportJSON {
+#bookForm>button,
+#exportJSON,
+#themeToggle {
   padding: 0.75rem 1.5rem;
   background: var(--secondary-color);
   color: white;
@@ -262,30 +273,40 @@ input[type="file"]:focus {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  width: fit-content;
 }
 
-#bookForm > button:hover,
-#exportJSON:hover {
+#themeToggle {
+  background: var(--text-main);
+  /* Defaults to main text color (dark/light) */
+  color: var(--bg-body);
+}
+
+#bookForm>button:hover,
+#exportJSON:hover,
+#themeToggle:hover {
   filter: brightness(0.9);
   transform: translateY(-2px);
   box-shadow: var(--shadow);
 }
 
-#bookForm > button:focus,
-#exportJSON:focus {
-  outline: 3px solid var(--secondary-color);
-  outline-offset: 2px;
-}
-
 .settings-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   max-width: 400px;
 }
 
-.settings-buttons label {
-  margin-bottom: 0;
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
 }
 
 /* Status Messages */
@@ -294,6 +315,7 @@ input[type="file"]:focus {
   border-radius: 6px;
   font-weight: 500;
   display: none;
+  margin-top: 1rem;
 }
 
 #formMsg.success {
@@ -316,12 +338,90 @@ footer {
   color: var(--text-muted);
   text-align: center;
   padding: 2rem 1rem;
-  margin-top: 3rem;
+  margin-top: auto;
   border-top: 1px solid var(--border-color);
 }
 
-footer p {
-  margin: 0;
+/* Desktop Layout (Sidebar) */
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    flex-direction: row;
+    /* Horizontal layout */
+    flex-wrap: wrap;
+    /* Allow header to be full width if needed, but let's try strict sidebar */
+    overflow-x: hidden;
+  }
+
+  header {
+    width: 100%;
+    /* Keep header top-level if simple, or move it? 
+       Let's stick to Header Top, Nav Left, Main Right 
+    */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  nav {
+    position: fixed;
+    top: 80px;
+    /* Below header */
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    padding: 2rem 1rem;
+  }
+
+  main {
+    margin-top: 80px;
+    /* Offset fixed header */
+    margin-left: 250px;
+    /* Offset fixed sidebar */
+    width: calc(100% - 250px);
+    max-width: 1200px;
+    padding: 3rem;
+  }
+
+  footer {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 1023px) {
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-color);
+    border-right: none;
+    position: sticky;
+    /* Sticky nav on mobile is nice */
+    top: 0;
+    z-index: 10;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    /* Stack on small screens */
+  }
 }
 
 /* Skip Link */
@@ -329,67 +429,13 @@ footer p {
   position: absolute;
   left: -999px;
   z-index: 999;
-  text-decoration: none;
+  background: var(--text-main);
+  color: var(--bg-body);
+  padding: 1rem;
+  border-radius: 6px;
 }
 
 .skip-link:focus {
   left: 10px;
   top: 10px;
-  background: var(--text-main);
-  color: var(--bg-body);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  box-shadow: var(--shadow-lg);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  header h1 {
-    font-size: 1.75rem;
-  }
-
-  main {
-    padding: 1rem 0.5rem;
-  }
-
-  section {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1rem;
-  }
-
-  nav {
-    gap: 0.5rem;
-  }
-
-  nav button {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  #records {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 1024px) {
-  main {
-    display: grid;
-    grid-template-columns: 280px 1fr; /* Increased sidebar width slightly */
-    gap: 2rem;
-  }
-
-  nav {
-    justify-content: center;
-  }
-
-  #dashboard {
-    grid-column: 1 / -1;
-  }
-
-  #records,
-  #form,
-  #settings,
-  #about {
-    grid-column: 2;
-  }
 }
