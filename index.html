@@ -50,6 +50,18 @@
 
     <section id="records">
       <h2>Records</h2>
+      <div class="controls-bar">
+        <input type="text" id="searchInput" placeholder="Search (Regex supported)..." aria-label="Search Records">
+        <div class="sort-controls">
+          <label for="sortBy">Sort by:</label>
+          <select id="sortBy">
+            <option value="dateAdded">Date Added</option>
+            <option value="title">Title (A-Z)</option>
+            <option value="pages">Pages (Low-High)</option>
+          </select>
+        </div>
+      </div>
+      <div id="recordsGrid"></div>
     </section>
 
     <section id="form">
