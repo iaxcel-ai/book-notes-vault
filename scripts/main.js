@@ -220,6 +220,25 @@ document.getElementById('records').addEventListener('click', (e) => {
   }
 });
 
+function editBook(id) {
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+
+  editingId = id;
+  document.getElementById("title").value = book.title;
+  document.getElementById("author").value = book.author;
+  document.getElementById("pages").value = book.pages;
+  document.getElementById("tag").value = book.tag;
+  document.getElementById("dateAdded").value = book.dateAdded;
+
+  // Change button text
+  const btn = document.querySelector("#bookForm button[type='submit']");
+  btn.textContent = "Update Book";
+
+  // Scroll to form
+  document.location.href = "#form";
+}
+
 function deleteBook(id) {
   const i = books.findIndex(b => b.id === id);
   if (i > -1) {
