@@ -1,3 +1,6 @@
+import { books } from './state.js';
+import { loadBooks, saveBooks } from './storage.js';
+import { renderBooks } from './ui.js';
 import { titleRegex, pagesRegex, dateRegex, tagRegex, dupWord } from './validators.js';
 
 // ... (existing code)
@@ -5,62 +8,114 @@ import { titleRegex, pagesRegex, dateRegex, tagRegex, dupWord } from './validato
 document.getElementById("bookForm")
   .addEventListener("submit", e => {
     e.preventDefault();
+    console.log("Form submitted");
 
-    const titleEl = document.getElementById("title");
-    const authorEl = document.getElementById("author");
-    const pagesEl = document.getElementById("pages");
-    const tagEl = document.getElementById("tag");
-    const dateAddedEl = document.getElementById("dateAdded");
-    const msg = document.getElementById("formMsg");
+    try {
+      const titleEl = document.getElementById("title");
+      const authorEl = document.getElementById("author");
+      const pagesEl = document.getElementById("pages");
+      const tagEl = document.getElementById("tag");
+      const dateAddedEl = document.getElementById("dateAdded");
+      const msg = document.getElementById("formMsg");
 
-    // Validation
-    if (!titleRegex.test(titleEl.value)) {
-      showError("Title invalid: No leading/trailing spaces.");
-      return;
+      // Get values and trim whitespace for better UX
+      const title = titleEl.value.trim();
+      const author = authorEl.value.trim();
+      const pages = pagesEl.value.trim(); // handle whitespace in number inputs
+      const tag = tagEl.value.trim();
+      const dateAdded = dateAddedEl.value;
+
+      console.log("Values:", { title, author, pages, tag, dateAdded });
+
+      // Validation
+      if (!title) {
+        showError("Title is required.");
+        return;
+      }
+      if (!titleRegex.test(title)) {
+        showError("Title invalid: No leading/trailing spaces allowed.");
+        return;
+      }
+      if (dupWord.test(title)) {
+        showError("Title invalid: Duplicate words found.");
+        return;
+      }
+      if (!pagesRegex.test(pages)) {
+        showError("Pages invalid: Must be a positive integer.");
+        return;
+      }
+      if (!tagRegex.test(tag)) {
+        showError("Tag invalid: Letters, spaces, hyphens only.");
+        return;
+      }
+      if (!dateAdded) {
+        showError("Date is required.");
+        return;
+      }
+
+      // Check for Editing
+      // Note: editingId is defined in outer scope in main.js
+      // We need to access it. It was defined in Step 140 code block.
+      // If it's missing from current view, we might have lost it? 
+      // Let's assume it's there. If not, I'll need to re-add it.
+
+      // Simple Push for now (Editing logic check in next step if needed)
+      // Wait, did I overwrite the editing logic in Step 166 view?
+      // Step 166 view shows NO editingId logic. I must have lost it during a replace.
+      // I will re-implement the basic Save first to fix the "Nothing happens" bug.
+      // And I will re-add the editing logic properly.
+
+      if (editingId) {
+        // Update existing
+        const index = books.findIndex(b => b.id === editingId);
+        if (index > -1) {
+          books[index] = {
+            ...books[index],
+            title: title,
+            author: author,
+            pages: +pages,
+            tag: tag,
+            dateAdded: dateAdded,
+            updatedAt: new Date().toISOString()
+          };
+          msg.textContent = "Book updated successfully!";
+        }
+        editingId = null;
+        document.querySelector("#bookForm button[type='submit']").textContent = "Save Book";
+      } else {
+        // Create new
+        const newBook = {
+          id: "bk_" + Date.now(),
+          title: title,
+          author: author,
+          pages: +pages,
+          tag: tag,
+          dateAdded: dateAdded,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        books.push(newBook);
+        msg.textContent = "Book added successfully!";
+      }
+
+      saveBooks(books);
+      render();
+
+      console.log("Book saved", books);
+
+      // Reset form
+      document.getElementById("bookForm").reset();
+
+      msg.className = "success";
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000);
+
+    } catch (err) {
+      console.error(err);
+      alert("Error saving book: " + err.message);
     }
-    if (dupWord.test(titleEl.value)) { // Advanced regex check
-      showError("Title invalid: Duplicate words found.");
-      return;
-    }
-    if (!pagesRegex.test(pagesEl.value)) {
-      showError("Pages invalid: Must be a positive number.");
-      return;
-    }
-    if (!tagRegex.test(tagEl.value)) {
-      showError("Tag invalid: Letters, spaces, hyphens only.");
-      return;
-    }
-    // Date regex is implicit via input type="date" but we can check if needed, 
-    // strictly speaking input type "date" value is YYYY-MM-DD
-    if (!dateAddedEl.value) {
-      showError("Date is required.");
-      return;
-    }
-
-    const newBook = {
-      id: "bk_" + Date.now(),
-      title: titleEl.value.trim(),
-      author: authorEl.value.trim(),
-      pages: +pagesEl.value,
-      tag: tagEl.value.trim(),
-      dateAdded: dateAddedEl.value,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    books.push(newBook);
-    saveBooks(books);
-    render();
-
-    // Reset form
-    document.getElementById("bookForm").reset();
-
-    msg.textContent = "Book added successfully!";
-    msg.className = "success";
-    msg.style.display = "block";
-    setTimeout(() => {
-      msg.style.display = "none";
-    }, 3000);
   });
 
 function showError(text) {
@@ -131,6 +186,9 @@ const state = {
   sortBy: "dateAdded"
 };
 
+let editingId = null; // Defined at module scope
+
+
 function render() {
   renderBooks(books, state.searchQuery, { by: state.sortBy });
   updateStats(books);
@@ -150,11 +208,15 @@ document.getElementById('sortBy').addEventListener('change', (e) => {
   render();
 });
 
-// Event delegation for delete buttons
+// Event delegation for delete and edit buttons
 document.getElementById('records').addEventListener('click', (e) => {
   if (e.target.classList.contains('delete-btn')) {
     const id = e.target.getAttribute('data-id');
     deleteBook(id);
+  }
+  if (e.target.classList.contains('edit-btn')) {
+    const id = e.target.getAttribute('data-id');
+    editBook(id);
   }
 });
 
