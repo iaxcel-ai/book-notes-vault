@@ -5,7 +5,7 @@
 }
 
 :root {
-  /* Light Theme (Default) */
+  /* light theme (default) */
   --primary-color: #12347b;
   --primary-dark: #1e40af;
   --secondary-color: #10b981;
@@ -19,17 +19,15 @@
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --gradient-header: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  /* Improved contrast for tags */
+  /* improved contrast for tags */
   --tag-bg: #f1f5f9;
-  /* slate-100 */
   --tag-text: #0f172a;
-  /* slate-900 */
   --input-bg: #ffffff;
   --highlight-bg: #fde047;
   --highlight-text: #000000;
 }
 
-/* Dark Theme overrides */
+/* dark theme overrides */
 body.dark-mode {
   --primary-color: #3b82f6;
   --primary-dark: #60a5fa;
@@ -45,9 +43,7 @@ body.dark-mode {
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
   --gradient-header: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
   --tag-bg: #334155;
-  /* slate-700 */
   --tag-text: #f1f5f9;
-  /* slate-100 */
   --input-bg: #374151;
   --highlight-bg: #fbbf24;
   --highlight-text: #000000;
@@ -91,7 +87,7 @@ header h1 {
   letter-spacing: -0.5px;
 }
 
-/* Navigation Sidebar on Desktop */
+/* navigation sidebar on desktop */
 nav {
   background: var(--bg-nav);
   border-right: 1px solid var(--border-color);
@@ -99,11 +95,11 @@ nav {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  /* Stack vertically by default for sidebar */
+  /* stack vertically by default for sidebar */
   gap: 0.5rem;
 }
 
-/* Nav Links as Buttons */
+/* nav links as buttons */
 .nav-link {
   display: block;
   padding: 0.75rem 1.25rem;
@@ -127,12 +123,12 @@ nav {
   background: var(--bg-body);
 }
 
-/* Main & Sections */
+/* main & sections */
 main {
   padding: 2rem;
   flex: 1;
   max-width: 1000px;
-  /* Limit width for readability */
+  /* limit width for readability */
 }
 
 section {
@@ -143,7 +139,25 @@ section {
   box-shadow: var(--shadow);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   scroll-margin-top: 2rem;
-  /* Spacing for smooth scroll target */
+  /* spacing for smooth scroll target */
+}
+
+/* about section links */
+#about p a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+#about p a:hover {
+  background: var(--primary-color);
+  color: white;
+  border-bottom-style: solid;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 section h2 {
@@ -154,7 +168,7 @@ section h2 {
   padding-bottom: 0.75rem;
 }
 
-/* Dashboard Stats Grid */
+/* dashboard stats grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -185,7 +199,7 @@ section h2 {
   margin: 0;
 }
 
-/* Records Controls */
+/* records controls */
 .controls-bar {
   display: flex;
   flex-wrap: wrap;
@@ -218,14 +232,14 @@ section h2 {
   cursor: pointer;
 }
 
-/* Records Grid Container */
+/* records grid container */
 #recordsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
-/* Records Section Header */
+/* records section header */
 #records>h2 {
   grid-column: 1 / -1;
   margin-bottom: 1rem;
@@ -347,7 +361,7 @@ input:focus {
 
 #themeToggle {
   background: var(--text-main);
-  /* Defaults to main text color (dark/light) */
+  /* defaults to main text color (dark/light) */
   color: var(--bg-body);
 }
 
@@ -410,14 +424,14 @@ footer {
   border-top: 1px solid var(--border-color);
 }
 
-/* Desktop Layout (Sidebar) */
+/* desktop layout (sidebar) */
 @media (min-width: 1024px) {
   body {
     display: flex;
     flex-direction: row;
-    /* Horizontal layout */
+    /* horizontal layout */
     flex-wrap: wrap;
-    /* Allow header to be full width if needed*/
+    /* allow header to be full width if needed*/
     overflow-x: hidden;
   }
 
@@ -435,7 +449,7 @@ footer {
   nav {
     position: fixed;
     top: 80px;
-    /* Below header */
+    /* below header */
     left: 0;
     bottom: 0;
     width: 250px;
@@ -458,7 +472,7 @@ footer {
   }
 }
 
-/* Mobile Responsive */
+/* mobile responsive */
 @media (max-width: 1023px) {
   nav {
     flex-direction: row;
@@ -482,7 +496,7 @@ footer {
 
   .stats-grid {
     grid-template-columns: 1fr;
-    /* Stack on small screens */
+    /* stack on small screens */
   }
 }
 
