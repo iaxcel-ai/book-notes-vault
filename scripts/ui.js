@@ -5,7 +5,7 @@ export function renderBooks(data, searchQuery = "", sortInfo = { by: 'dateAdded'
 
   if (!container) return;
 
-  // 1. Filter
+  // 1. filter
   let filtered = data;
   let regex = null;
   if (searchQuery) {
@@ -19,7 +19,7 @@ export function renderBooks(data, searchQuery = "", sortInfo = { by: 'dateAdded'
     }
   }
 
-  // 2. Sort
+  // 2. sort
   filtered.sort((a, b) => {
     if (sortInfo.by === 'title') return a.title.localeCompare(b.title);
     if (sortInfo.by === 'pages') return a.pages - b.pages;
@@ -36,7 +36,7 @@ export function renderBooks(data, searchQuery = "", sortInfo = { by: 'dateAdded'
   }
 
   const booksHTML = filtered.map(b => {
-    // Highlight if regex exists
+    // highlight if regex exists
     const titleHtml = regex ? highlight(escapeHtml(b.title), regex) : escapeHtml(b.title);
     const authorHtml = regex ? highlight(escapeHtml(b.author), regex) : escapeHtml(b.author);
     const tagHtml = regex ? highlight(escapeHtml(b.tag), regex) : escapeHtml(b.tag);

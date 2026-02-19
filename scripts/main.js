@@ -3,132 +3,18 @@ import { loadBooks, saveBooks } from './storage.js';
 import { renderBooks } from './ui.js';
 import { titleRegex, pagesRegex, dateRegex, tagRegex, dupWord } from './validators.js';
 
-// ... (existing code)
+// --- state ---
+const state = {
+  searchQuery: "",
+  sortBy: "dateAdded"
+};
 
-document.getElementById("bookForm")
-  .addEventListener("submit", e => {
-    e.preventDefault();
-    console.log("Form submitted");
+// --- initialization ---
 
-    try {
-      const titleEl = document.getElementById("title");
-      const authorEl = document.getElementById("author");
-      const pagesEl = document.getElementById("pages");
-      const tagEl = document.getElementById("tag");
-      const dateAddedEl = document.getElementById("dateAdded");
-      const msg = document.getElementById("formMsg");
+// 1. load books
+books.push(...loadBooks());
 
-      // Get values and trim whitespace for better UX
-      const title = titleEl.value.trim();
-      const author = authorEl.value.trim();
-      const pages = pagesEl.value.trim(); // handle whitespace in number inputs
-      const tag = tagEl.value.trim();
-      const dateAdded = dateAddedEl.value;
-
-      console.log("Values:", { title, author, pages, tag, dateAdded });
-
-      // Validation
-      if (!title) {
-        showError("Title is required.");
-        return;
-      }
-      if (!titleRegex.test(title)) {
-        showError("Title invalid: No leading/trailing spaces allowed.");
-        return;
-      }
-      if (dupWord.test(title)) {
-        showError("Title invalid: Duplicate words found.");
-        return;
-      }
-      if (!pagesRegex.test(pages)) {
-        showError("Pages invalid: Must be a positive integer.");
-        return;
-      }
-      if (!tagRegex.test(tag)) {
-        showError("Tag invalid: Letters, spaces, hyphens only.");
-        return;
-      }
-      if (!dateAdded) {
-        showError("Date is required.");
-        return;
-      }
-
-      // Check for Editing
-      // Note: editingId is defined in outer scope in main.js
-      // We need to access it. It was defined in Step 140 code block.
-      // If it's missing from current view, we might have lost it? 
-      // Let's assume it's there. If not, I'll need to re-add it.
-
-      // Simple Push for now (Editing logic check in next step if needed)
-      // Wait, did I overwrite the editing logic in Step 166 view?
-      // Step 166 view shows NO editingId logic. I must have lost it during a replace.
-      // I will re-implement the basic Save first to fix the "Nothing happens" bug.
-      // And I will re-add the editing logic properly.
-
-      if (editingId) {
-        // Update existing
-        const index = books.findIndex(b => b.id === editingId);
-        if (index > -1) {
-          books[index] = {
-            ...books[index],
-            title: title,
-            author: author,
-            pages: +pages,
-            tag: tag,
-            dateAdded: dateAdded,
-            updatedAt: new Date().toISOString()
-          };
-          msg.textContent = "Book updated successfully!";
-        }
-        editingId = null;
-        document.querySelector("#bookForm button[type='submit']").textContent = "Save Book";
-      } else {
-        // Create new
-        const newBook = {
-          id: "bk_" + Date.now(),
-          title: title,
-          author: author,
-          pages: +pages,
-          tag: tag,
-          dateAdded: dateAdded,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        books.push(newBook);
-        msg.textContent = "Book added successfully!";
-      }
-
-      saveBooks(books);
-      render();
-
-      console.log("Book saved", books);
-
-      // Reset form
-      document.getElementById("bookForm").reset();
-
-      msg.className = "success";
-      msg.style.display = "block";
-      setTimeout(() => {
-        msg.style.display = "none";
-      }, 3000);
-
-    } catch (err) {
-      console.error(err);
-      alert("Error saving book: " + err.message);
-    }
-  });
-
-function showError(text) {
-  const msg = document.getElementById("formMsg");
-  msg.textContent = text;
-  msg.className = "error";
-  msg.style.display = "block";
-  setTimeout(() => {
-    msg.style.display = "none";
-  }, 4000);
-}
-
-// Theme toggling
+// 2. setup theme (run on every page)
 const themeToggleBtn = document.getElementById('themeToggle');
 const body = document.body;
 const savedTheme = localStorage.getItem('vault:theme');
@@ -137,22 +23,42 @@ if (savedTheme === 'dark') {
   body.classList.add('dark-mode');
 }
 
-themeToggleBtn.addEventListener('click', () => {
-  body.classList.toggle('dark-mode');
-  const isDark = body.classList.contains('dark-mode');
-  localStorage.setItem('vault:theme', isDark ? 'dark' : 'light');
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    const isDark = body.classList.contains('dark-mode');
+    localStorage.setItem('vault:theme', isDark ? 'dark' : 'light');
+  });
+}
+
+// 3. highlight current nav link
+const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+const navLinks = document.querySelectorAll('.nav-link');
+
+// handle root path mapping if necessary
+navLinks.forEach(link => {
+  const linkPath = link.getAttribute('href');
+  if (linkPath === currentPath || (currentPath === 'index.html' && linkPath === 'dashboard.html')) { 
+      link.classList.add('active'); 
+  }
 });
 
 
-function updateStats(data) {
-  // 1. Total Books
-  document.getElementById("totalBooks").textContent = data.length;
+// --- page-specific logic ---
 
-  // 2. Total Pages
+// a. helper: update stats (dashboard)
+function updateStats(data) {
+  const totalBooksEl = document.getElementById("totalBooks");
+  if (!totalBooksEl) return; // exit if not on dashboard
+
+  // 1. total books
+  totalBooksEl.textContent = data.length;
+
+  // 2. total pages
   const pages = data.reduce((a, b) => a + (Number(b.pages) || 0), 0);
   document.getElementById("totalPages").textContent = pages.toLocaleString();
 
-  // 3. Top Tag
+  // 3. top tag
   const tagCounts = {};
   data.forEach(book => {
     const t = book.tag ? book.tag.trim() : "Uncategorized";
@@ -169,7 +75,7 @@ function updateStats(data) {
   }
   document.getElementById("topTag").textContent = topTag;
 
-  // 4. Last 7 Days
+  // 4. last 7 days
   const now = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(now.getDate() - 7);
@@ -181,35 +87,178 @@ function updateStats(data) {
   document.getElementById("last7").textContent = recentBooks.length;
 }
 
-const state = {
-  searchQuery: "",
-  sortBy: "dateAdded"
-};
 
-let editingId = null; // Defined at module scope
-
-
+// b. render logic
 function render() {
-  renderBooks(books, state.searchQuery, { by: state.sortBy });
-  updateStats(books);
+  // only render records if the grid exists
+  if (document.getElementById("recordsGrid")) {
+    renderBooks(books, state.searchQuery, { by: state.sortBy });
+  }
+  // only update stats if stats exist
+  if (document.getElementById("totalBooks")) {
+    updateStats(books);
+  }
 }
 
-books.push(...loadBooks());
+// initial render
 render();
 
-// Controls
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  state.searchQuery = e.target.value.trim();
-  render();
-});
 
-document.getElementById('sortBy').addEventListener('change', (e) => {
-  state.sortBy = e.target.value;
-  render();
-});
+// --- event listeners & page logic ---
 
-// Event delegation for delete and edit buttons
-document.getElementById('records').addEventListener('click', (e) => {
+// 1. add book form
+const bookForm = document.getElementById("bookForm");
+if (bookForm) {
+  // check for 'id' in URL -> edit mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('id');
+  
+  if (editId) {
+    const book = books.find(b => b.id === editId);
+    if (book) {
+      document.getElementById("title").value = book.title;
+      document.getElementById("author").value = book.author;
+      document.getElementById("pages").value = book.pages;
+      document.getElementById("tag").value = book.tag;
+      document.getElementById("dateAdded").value = book.dateAdded;
+      
+      const submitBtn = document.querySelector("#bookForm button[type='submit']");
+      if (submitBtn) submitBtn.textContent = "Update Book";
+    }
+  }
+
+  bookForm.addEventListener("submit", e => {
+    e.preventDefault();
+    console.log("Form submitted");
+
+    try {
+      const titleEl = document.getElementById("title");
+      const authorEl = document.getElementById("author");
+      const pagesEl = document.getElementById("pages");
+      const tagEl = document.getElementById("tag");
+      const dateAddedEl = document.getElementById("dateAdded");
+      const msg = document.getElementById("formMsg");
+
+      const title = titleEl.value.trim();
+      const author = authorEl.value.trim();
+      const pages = pagesEl.value.trim();
+      const tag = tagEl.value.trim();
+      const dateAdded = dateAddedEl.value;
+
+      // validation
+      if (!title) { showError("Title is required."); return; }
+      if (!titleRegex.test(title)) { showError("Title invalid: No leading/trailing spaces allowed."); return; }
+      if (dupWord.test(title)) { showError("Title invalid: Duplicate words found."); return; }
+      if (!pagesRegex.test(pages)) { showError("Pages invalid: Must be a positive integer."); return; }
+      if (!tagRegex.test(tag)) { showError("Tag invalid: Letters, spaces, hyphens only."); return; }
+      if (!dateAdded) { showError("Date is required."); return; }
+
+      const currentUrlParams = new URLSearchParams(window.location.search);
+      const currentEditId = currentUrlParams.get('id');
+
+      if (currentEditId) {
+        // update existing
+        const index = books.findIndex(b => b.id === currentEditId);
+        if (index > -1) {
+          books[index] = {
+            ...books[index],
+            title: title,
+            author: author,
+            pages: +pages,
+            tag: tag,
+            dateAdded: dateAdded,
+            updatedAt: new Date().toISOString()
+          };
+          if (msg) msg.textContent = "Book updated successfully!";
+        }
+      } else {
+        // create new
+        const newBook = {
+          id: "bk_" + Date.now(),
+          title: title,
+          author: author,
+          pages: +pages,
+          tag: tag,
+          dateAdded: dateAdded,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        books.push(newBook);
+        if (msg) msg.textContent = "Book added successfully!";
+      }
+
+      saveBooks(books);
+      render();
+
+      console.log("Book saved", books);
+
+      if (!currentEditId) {
+          bookForm.reset();
+      }
+
+      if (msg) {
+        msg.className = "success";
+        msg.style.display = "block";
+        setTimeout(() => {
+            msg.style.display = "none";
+            // navigate back to records if desired
+            if (currentEditId) {
+                window.location.href = "records.html";
+            }
+        }, 1500);
+      } else if (currentEditId) {
+           window.location.href = "records.html";
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Error saving book: " + err.message);
+    }
+  });
+}
+
+function showError(text) {
+  const msg = document.getElementById("formMsg");
+  if (msg) {
+    msg.textContent = text;
+    msg.className = "error";
+    msg.style.display = "block";
+    setTimeout(() => {
+      msg.style.display = "none";
+    }, 4000);
+  } else {
+      alert(text);
+  }
+}
+
+// 2. records page controls
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    state.searchQuery = e.target.value.trim();
+    render();
+  });
+}
+
+const sortBy = document.getElementById('sortBy');
+if (sortBy) {
+  sortBy.addEventListener('change', (e) => {
+    state.sortBy = e.target.value;
+    render();
+  });
+}
+
+// event delegation for delete and edit buttons
+const recordsSection = document.getElementById('records'); // section ID
+const recordsGrid = document.getElementById('recordsGrid');
+
+if (recordsSection) {
+    recordsSection.addEventListener('click', handleRecordClicks);
+} else if (recordsGrid) {
+    recordsGrid.addEventListener('click', handleRecordClicks);
+}
+
+function handleRecordClicks(e) {
   if (e.target.classList.contains('delete-btn')) {
     const id = e.target.getAttribute('data-id');
     deleteBook(id);
@@ -218,25 +267,10 @@ document.getElementById('records').addEventListener('click', (e) => {
     const id = e.target.getAttribute('data-id');
     editBook(id);
   }
-});
+}
 
 function editBook(id) {
-  const book = books.find(b => b.id === id);
-  if (!book) return;
-
-  editingId = id;
-  document.getElementById("title").value = book.title;
-  document.getElementById("author").value = book.author;
-  document.getElementById("pages").value = book.pages;
-  document.getElementById("tag").value = book.tag;
-  document.getElementById("dateAdded").value = book.dateAdded;
-
-  // Change button text
-  const btn = document.querySelector("#bookForm button[type='submit']");
-  btn.textContent = "Update Book";
-
-  // Scroll to form
-  document.location.href = "#form";
+  window.location.href = `add.html?id=${id}`;
 }
 
 function deleteBook(id) {
@@ -250,10 +284,10 @@ function deleteBook(id) {
   }
 }
 
-
-
-document.getElementById("importJSON")
-  .addEventListener("change", e => {
+// 3. settings page controls
+const importInput = document.getElementById("importJSON");
+if (importInput) {
+  importInput.addEventListener("change", e => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -263,7 +297,6 @@ document.getElementById("importJSON")
         const imported = JSON.parse(event.target.result);
         if (!Array.isArray(imported)) throw new Error("Root must be an array");
 
-        // Validate structure
         const validBooks = imported.filter(b =>
           b.title && b.author && !isNaN(b.pages) && b.tag && b.dateAdded
         ).map(b => ({
@@ -279,12 +312,9 @@ document.getElementById("importJSON")
         }
 
         if (confirm(`Found ${validBooks.length} valid books. Import and overwrite unique ones?`)) {
-          // Merge: Add if ID doesn't exist, or just append new ones? 
-          // Let's strict merge: if ID exists, skip. If Title+Author exists? 
-          // Simplest: Add all validBooks.
           books.push(...validBooks);
           saveBooks(books);
-          render();
+          // render(); // redundant but it's cool
           alert("Import successful!");
         }
 
@@ -293,17 +323,20 @@ document.getElementById("importJSON")
       }
     };
     reader.readAsText(file);
-    e.target.value = ''; // Reset input
+    e.target.value = '';
   });
+}
 
-document.getElementById("exportJSON").onclick = () => {
-  const blob = new Blob(
-    [JSON.stringify(books)],
-    { type: "application/json" }
-  );
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "books.json";
-  a.click();
-};
-
+const exportBtn = document.getElementById("exportJSON");
+if (exportBtn) {
+  exportBtn.onclick = () => {
+    const blob = new Blob(
+      [JSON.stringify(books)],
+      { type: "application/json" }
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "books.json";
+    a.click();
+  };
+}
